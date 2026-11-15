@@ -1,0 +1,19 @@
+Proposed Distributed and Cloud Database Architecture
+
+For Apex Digital Bank I'd suggest a distributed database architecture with a primary database and two replicas in separate cloud availability zones.
+
+The main database would be the one to handle the authorised transactions (deposits, withdrawals, account balance updates etc). Any changes made to the main database would be automatically replicated to the other database servers.
+
+One replica could be used for read only operations (account enquiries, reporting etc), the other could be a recovery/failover database in the event the primary database became unavailable. This would improve the availability of the service and reduce the reliance on a single database server.
+
+Data consistency: given that we're talking about banking transactions and financial records it's important to have the right account balances. The bank would need to ensure that the critical transactions are using the authoritative data (i.e. the actual data) rather than some potentially stale replica. Transaction controls and the right replication settings would go a long way to minimising any inconsistencies.
+
+Database sharding: as the number of customers grows the bank could look at splitting the customer records across database shards using a suitable customer key. Transactions that span multiple shards would of course require some additional co-ordination to ensure data consistency.
+
+Cloud deployment: the architecture could be on a managed cloud database platform with monitoring, automated backups, access controls and failover. The bank would also have to consider data protection, recovery requirements and the operational costs.
+
+Practical demonstration and limitations: in the practical I just copied the Apex Digital Bank SQLite database and checked the records. I then changed the balance of a test account in the original and checked the replica to demonstrate how data can go out of sync if changes aren't properly synchronised.
+
+This was a local simulation of the replication and consistency concepts. Automatic replication, sharding, failover and cloud deployment were all part of the proposed architecture but none of these were actually implemented or tested.
+
+The exercise actually did help me to see the difference between just copying a database and maintaining a synchronised replica. It also highlighted the fact that distributed banking systems in particular need a very careful consideration of consistency and availability.
